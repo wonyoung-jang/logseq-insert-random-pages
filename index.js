@@ -43,7 +43,6 @@ const settingsTemplate = [
 ];
 
 function getUniqueRandomPages(pages, count) {
-  // Shuffle pages and take the first 'count'
   const shuffled = pages.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 }
@@ -82,25 +81,19 @@ async function openRandomNote() {
     }
 
     if (journalMode === "only") {
-      // Include only journal pages
       pages = filterPagesByFilter(pages, "journal?", true);
     } else if (journalMode === "none") {
-      // Exclude journal pages
       pages = filterPagesByFilter(pages, "journal?", false);
     }
 
     if (danglingMode === "only") {
-      // Include only dangling pages
       pages = filterPagesByFilter(pages, "file", false);
     } else if (danglingMode === "none") {
-      // Exclude dangling pages
       pages = filterPagesByFilter(pages, "file", true);
     }
 
-    // Select random pages ensuring uniqueness.
     let selectedPages = getUniqueRandomPages(pages, Math.min(randomPagesToReturn, pages.length));
 
-    // Sort the selected pages alphabetically by name (or original-name if available).
     if (sortPages) {
       selectedPages = selectedPages.sort((a, b) => {
         const nameA = a.originalName.toLowerCase();
@@ -141,5 +134,4 @@ function main() {
   logseq.Editor.registerSlashCommand("🎲 Random Note", openRandomNote);
 }
 
-// bootstrap
 logseq.useSettingsSchema(settingsTemplate).ready(main).catch(console.error);
