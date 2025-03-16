@@ -1,0 +1,6 @@
+node_modules/
+.*/
+dist/
+.gitattributes
+test.js
+index.ts

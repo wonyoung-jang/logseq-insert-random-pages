@@ -1,0 +1,25 @@
+{
+  "name": "logseq-insert-random-pages",
+  "version": "0.0.1",
+  "author": "Wonyoung Jang",
+  "description": "Insert random pages to current block.",
+  "license": "MIT",
+  "logseq": {
+    "main": "dist/index.html",
+    "title": "Insert Random Pages",
+    "id": "logseq-insert-random-pages",
+    "icon": "./icon.svg"
+  },
+  "devDependencies": {
+    "@logseq/libs": "^0.0.17",
+    "parcel": "2.9.3"
+  },
+  "browserslist": [
+    "chrome 80"
+  ],
+  "scripts": {
+    "build": "parcel ./index.html --public-url ./",
+    "dev": "parcel build --public-url . --no-source-maps index.html",
+    "clean": "npx rimraf dist .parcel-cache .cache"
+  } 
+}
