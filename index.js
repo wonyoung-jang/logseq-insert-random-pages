@@ -12,14 +12,14 @@ const settingsTemplate = [
     key: "headerBlock",
     type: "string",
     default: "",
-    title: "Header Block (optional)",
-    description: "Include a header parent block before the random notes?",
+    title: "Header block",
+    description: "Include a header parent block before the random notes. (optional, leave empty to disable)",
   },
   {
     key: "journalMode",
     type: "enum",
-    default: "none",
-    title: "Journal Mode",
+    default: "include",
+    title: "Journal mode",
     description: "Select the journal mode",
     enumChoices: ["none", "include", "only"],
     enumPicker: "radio",
@@ -28,9 +28,18 @@ const settingsTemplate = [
     key: "sortPages",
     type: "boolean",
     default: true,
-    title: "Sort Pages",
+    title: "Sort pages",
     description: "Sort the pages alphabetically",
-  }
+  },
+  {
+    key: "danglingMode",
+    type: "enum",
+    default: "include",
+    title: "Dangling mode",
+    description: "Select the dangling mode",
+    enumChoices: ["none", "include", "only"],
+    enumPicker: "radio",
+  },
 ];
 
 function getUniqueRandomPages(pages, count) {
@@ -39,11 +48,17 @@ function getUniqueRandomPages(pages, count) {
   return shuffled.slice(0, count);
 }
 
+function filterPagesByFilter(pages, filter, condition) {
+  return pages.filter((page) => {
+    return condition ? Boolean(page[filter]) : !page[filter];
+  });
+}
+
 async function insertPageLink(page) {
   if (page && page.name) {
     const currBlock = await logseq.Editor.getCurrentBlock();
     const currentBlock = currBlock?.uuid || null;
-    const blockContent = `[[${page.originalName || page.name}]]`;
+    const blockContent = `[[${page.originalName}]]`;
     await logseq.Editor.insertBlock(currentBlock, blockContent, {
       sibling: true,
       before: true,
@@ -55,6 +70,8 @@ async function insertPageLink(page) {
 async function openRandomNote() {
   const randomPagesToReturn = Math.max(1, parseInt(logseq.settings.randomPagesToReturn || 1));
   const sortPages = logseq.settings.sortPages;
+  const journalMode = logseq.settings.journalMode;
+  const danglingMode = logseq.settings.danglingMode;
 
   try {
     const ret = await logseq.Editor.getAllPages();
@@ -63,26 +80,42 @@ async function openRandomNote() {
     if (pages.length === 0) {
       return logseq.UI.showMsg("No pages found", "warning");
     }
-    
+
+    if (journalMode === "only") {
+      // Include only journal pages
+      pages = filterPagesByFilter(pages, "journal?", true);
+    } else if (journalMode === "none") {
+      // Exclude journal pages
+      pages = filterPagesByFilter(pages, "journal?", false);
+    }
+
+    if (danglingMode === "only") {
+      // Include only dangling pages
+      pages = filterPagesByFilter(pages, "file", false);
+    } else if (danglingMode === "none") {
+      // Exclude dangling pages
+      pages = filterPagesByFilter(pages, "file", true);
+    }
+
     // Select random pages ensuring uniqueness.
     let selectedPages = getUniqueRandomPages(pages, Math.min(randomPagesToReturn, pages.length));
-    
+
     // Sort the selected pages alphabetically by name (or original-name if available).
     if (sortPages) {
       selectedPages = selectedPages.sort((a, b) => {
-        const nameA = (a.originalName || a.name).toLowerCase();
-        const nameB = (b.originalName || b.name).toLowerCase();
+        const nameA = a.originalName.toLowerCase();
+        const nameB = b.originalName.toLowerCase();
         return nameA.localeCompare(nameB);
       });
     }
-    
+
     const headerBlockContent = (logseq.settings.headerBlock || "").trim();
-    
+
     if (headerBlockContent) {
       const batchBlock = {
         content: headerBlockContent,
-        children: selectedPages.map(page => ({
-          content: `[[${page.originalName || page.name}]]`,
+        children: selectedPages.map((page) => ({
+          content: `[[${page.originalName}]]`,
         })),
       };
       const currBlock = await logseq.Editor.getCurrentBlock();
