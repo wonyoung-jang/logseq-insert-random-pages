@@ -2,6 +2,14 @@ import "@logseq/libs";
 
 const settingsTemplate = [
   {
+    key: "keyboard",
+    type: "string",
+    default: "r t",
+    description:
+      'Type in the key or key combination you wish to use to toggle. If you want multiple key combinations, add a space or "+" between the keys ("r n" or "ctrl+r"). \n\rIMPORTANT: After changing the hotkey, you must restart Logseq to take effect.',
+    title: "Keyboard Hotkey",
+  },
+  {
     key: "randomPagesToReturn",
     type: "number",
     default: 1,
@@ -162,8 +170,33 @@ async function openRandomNote() {
 }
 
 function main() {
-  logseq.provideModel({ openRandomNote });
+  logseq.provideModel({ 
+    handleRandomPages: openRandomNote,
+   });
   logseq.Editor.registerSlashCommand("🎲 Random Note", openRandomNote);
+  logseq.App.registerUIItem("toolbar", {
+    key: "RandomPages",
+    template: `
+      <span class="logseq-insert-random-pages-toolbar">
+        <a title="Insert random pages (r t)" class="button" data-on-click="handleRandomPages">
+          <i class="ti ti-dice-5"></i>
+        </a>
+      </span>
+    `,
+  });
+  logseq.App.registerCommandPalette(
+    {
+      key: "logseq-insert-random-pages",
+      label: "Insert Random Pages",
+      keybinding: {
+        mode: "non-editing",
+        binding: logseq.settings.keyboard || "r t",
+      },
+    },
+    () => {
+      openRandomNote();
+    }
+  );
 }
 
 logseq.useSettingsSchema(settingsTemplate).ready(main).catch(console.error);
