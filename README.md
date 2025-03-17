@@ -23,8 +23,9 @@ Logseq plugin to insert random pages as backlinks.
 
 ## Usage
 
+- **Slash Command:** Type `/` in an edit block and select "🎲 Random Note".
 - **Command Palette:** Open the Command Palette and select "Insert Random Pages".
-- **Toolbar:** Click on the toolbar button (🎲 Random Note) to trigger the command.
+- **Toolbar:** Click on the toolbar button to trigger the command.
 - **Hotkey:** Use the configured hotkey (default is `r t`). After changing the hotkey in settings, restart Logseq.
 
 ## Configuration
