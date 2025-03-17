@@ -48,6 +48,15 @@ const settingsTemplate = [
     description: "Select the namespace mode",
     enumChoices: ["none", "include", "only"],
     enumPicker: "radio",
+  },
+  {
+    key: "propertiesMode",
+    type: "enum",
+    default: "include",
+    title: "Properties mode",
+    description: "Select the properties mode",
+    enumChoices: ["none", "include", "only"],
+    enumPicker: "radio",
   }
 ];
 
@@ -81,6 +90,7 @@ async function openRandomNote() {
   const journalMode = logseq.settings.journalMode;
   const danglingMode = logseq.settings.danglingMode;
   const namespaceMode = logseq.settings.namespaceMode;
+  const propertiesMode = logseq.settings.propertiesMode;
 
   try {
     const ret = await logseq.Editor.getAllPages();
@@ -106,6 +116,12 @@ async function openRandomNote() {
       pages = filterPagesByFilter(pages, "namespace", true);
     } else if (namespaceMode === "none") {
       pages = filterPagesByFilter(pages, "namespace", false);
+    }
+
+    if (propertiesMode === "only") {
+      pages = filterPagesByFilter(pages, "properties", true);
+    } else if (propertiesMode === "none") {
+      pages = filterPagesByFilter(pages, "properties", false);
     }
 
     let selectedPages = getUniqueRandomPages(pages, Math.min(randomPagesToReturn, pages.length));
