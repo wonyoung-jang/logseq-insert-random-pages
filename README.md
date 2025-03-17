@@ -30,6 +30,8 @@ Logseq plugin to insert random pages as backlinks.
 
 ## Configuration
 
+![settings](images/logseq-insert-random-pages-settings.png)
+
 - **Keyboard Hotkey:** Set the key combination to trigger the plugin.
 - **Number of Random Pages:** Control how many random pages to return.
 - **Header Block:** Provide optional header parent block text.
