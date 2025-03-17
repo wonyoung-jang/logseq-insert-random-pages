@@ -1,7 +1,7 @@
 node_modules/
-.*/
 dist/
+logseq-insert-random-pages/
+.parcel-cache
 .gitattributes
 test.js
 index.ts
-logseq-insert-random-pages/
