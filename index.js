@@ -173,7 +173,9 @@ function main() {
   logseq.provideModel({ 
     handleRandomPages: openRandomNote,
    });
+
   logseq.Editor.registerSlashCommand("🎲 Random Note", openRandomNote);
+
   logseq.App.registerUIItem("toolbar", {
     key: "RandomPages",
     template: `
@@ -184,6 +186,7 @@ function main() {
       </span>
     `,
   });
+  
   logseq.App.registerCommandPalette(
     {
       key: "logseq-insert-random-pages",
