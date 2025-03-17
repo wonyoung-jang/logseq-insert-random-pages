@@ -20,6 +20,6 @@
   "scripts": {
     "build": "parcel ./index.html --public-url ./",
     "dev": "parcel build --public-url . --no-source-maps index.html",
-    "clean": "npx rimraf dist .parcel-cache .cache"
+    "clean": "npm rimraf dist .parcel-cache .cache"
   } 
 }
