@@ -16,6 +16,13 @@ const settingsTemplate = [
     description: "Include a header parent block before the random notes. (optional, leave empty to disable)",
   },
   {
+    key: "sortPages",
+    type: "boolean",
+    default: true,
+    title: "Sort pages",
+    description: "Sort the pages alphabetically",
+  },
+  {
     key: "journalMode",
     type: "enum",
     default: "include",
@@ -23,13 +30,6 @@ const settingsTemplate = [
     description: "Select the journal mode",
     enumChoices: ["none", "include", "only"],
     enumPicker: "radio",
-  },
-  {
-    key: "sortPages",
-    type: "boolean",
-    default: true,
-    title: "Sort pages",
-    description: "Sort the pages alphabetically",
   },
   {
     key: "danglingMode",
@@ -40,6 +40,15 @@ const settingsTemplate = [
     enumChoices: ["none", "include", "only"],
     enumPicker: "radio",
   },
+  {
+    key: "namespaceMode",
+    type: "enum",
+    default: "include",
+    title: "Namespace mode",
+    description: "Select the namespace mode",
+    enumChoices: ["none", "include", "only"],
+    enumPicker: "radio",
+  }
 ];
 
 function getUniqueRandomPages(pages, count) {
@@ -71,6 +80,7 @@ async function openRandomNote() {
   const sortPages = logseq.settings.sortPages;
   const journalMode = logseq.settings.journalMode;
   const danglingMode = logseq.settings.danglingMode;
+  const namespaceMode = logseq.settings.namespaceMode;
 
   try {
     const ret = await logseq.Editor.getAllPages();
@@ -90,6 +100,12 @@ async function openRandomNote() {
       pages = filterPagesByFilter(pages, "file", false);
     } else if (danglingMode === "none") {
       pages = filterPagesByFilter(pages, "file", true);
+    }
+
+    if (namespaceMode === "only") {
+      pages = filterPagesByFilter(pages, "namespace", true);
+    } else if (namespaceMode === "none") {
+      pages = filterPagesByFilter(pages, "namespace", false);
     }
 
     let selectedPages = getUniqueRandomPages(pages, Math.min(randomPagesToReturn, pages.length));
