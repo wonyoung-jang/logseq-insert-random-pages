@@ -18,7 +18,7 @@ Logseq plugin to insert random pages as backlinks.
 
 ## Installation
 
-- Install on Logseq Marketplace (recommended)
+- **Recommended** Go to the `Marketplace` in Logseq Plugins and search for `Insert Random Pages` → Click `Install`
 - `Load unpacked plugin` in Logseq Desktop client.
 
 ## Usage
