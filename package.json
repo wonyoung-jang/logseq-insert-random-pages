@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@logseq/libs": "^0.0.17",
-    "parcel-bundler": "^1.12.5"
+    "parcel": "^2.0.0"
   },
   "browserslist": [
     "chrome 80"

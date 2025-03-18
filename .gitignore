@@ -2,6 +2,7 @@ node_modules/
 dist/
 logseq-insert-random-pages/
 .parcel-cache
+.cache
 .gitattributes
 test.js
 index.ts
