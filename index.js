@@ -92,8 +92,16 @@ async function insertPageLink(page) {
   }
 }
 
-async function openRandomNote() {
-  const randomPagesToReturn = Math.max(1, parseInt(logseq.settings.randomPagesToReturn || 1));
+async function insertRandomNotes() {
+  let randomPagesToReturn = Math.max(1, parseInt(logseq.settings.randomPagesToReturn || 1));
+  const { uuid } = await logseq.Editor.getCurrentBlock();
+  const { content } = await logseq.Editor.getBlock(uuid);
+  const { pos } = await logseq.Editor.getEditingCursorPosition();
+  let text = content.slice(0, pos);
+  if (text.length > 0) {
+    randomPagesToReturn = Math.max(1, parseInt(text || 1));
+  }
+
   const sortPages = logseq.settings.sortPages;
   const journalMode = logseq.settings.journalMode;
   const danglingMode = logseq.settings.danglingMode;
@@ -171,10 +179,10 @@ async function openRandomNote() {
 
 function main() {
   logseq.provideModel({ 
-    handleRandomPages: openRandomNote,
+    handleRandomPages: insertRandomNotes,
    });
 
-  logseq.Editor.registerSlashCommand("🎲 Random Note", openRandomNote);
+  logseq.Editor.registerSlashCommand("🎲 Random Note", insertRandomNotes);
 
   logseq.App.registerUIItem("toolbar", {
     key: "RandomPages",
@@ -197,7 +205,7 @@ function main() {
       },
     },
     () => {
-      openRandomNote();
+      insertRandomNotes();
     }
   );
 }
