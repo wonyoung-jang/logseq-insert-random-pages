@@ -102,7 +102,7 @@ async function openRandomNote() {
 
   try {
     const ret = await logseq.Editor.getAllPages();
-    const pages = ret?.flat() || [];
+    let pages = ret?.flat() || [];
 
     if (pages.length === 0) {
       return logseq.UI.showMsg("No pages found", "warning");
