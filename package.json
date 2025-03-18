@@ -19,6 +19,6 @@
   ],
   "scripts": {
     "dev": "parcel index.html --port 1235",
-    "build": "parcel build --public-url ./ --no-source-maps index.html  --no-minify"
+    "build": "parcel build --public-url ./ --no-source-maps index.html"
   } 
 }
