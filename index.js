@@ -65,7 +65,7 @@ const settingsTemplate = [
     description: "Select the properties mode",
     enumChoices: ["none", "include", "only"],
     enumPicker: "radio",
-  }
+  },
 ];
 
 function getUniqueRandomPages(pages, count) {
@@ -92,14 +92,17 @@ async function insertPageLink(page) {
   }
 }
 
-async function insertRandomNotes() {
+async function insertRandomPages() {
   let randomPagesToReturn = Math.max(1, parseInt(logseq.settings.randomPagesToReturn || 1));
-  const { uuid } = await logseq.Editor.getCurrentBlock();
-  const { content } = await logseq.Editor.getBlock(uuid);
-  const { pos } = await logseq.Editor.getEditingCursorPosition();
-  let text = content.slice(0, pos);
-  if (text.length > 0) {
-    randomPagesToReturn = Math.max(1, parseInt(text || 1));
+  const editingMode = await logseq.Editor.checkEditing();
+  if (editingMode) {
+    const { uuid } = await logseq.Editor.getCurrentBlock();
+    const { content } = await logseq.Editor.getBlock(uuid);
+    const { pos } = await logseq.Editor.getEditingCursorPosition();
+    let text = content.slice(0, pos);
+    if (text.length > 0) {
+      randomPagesToReturn = Math.max(1, parseInt(text || 1));
+    }
   }
 
   const sortPages = logseq.settings.sortPages;
@@ -178,11 +181,13 @@ async function insertRandomNotes() {
 }
 
 function main() {
-  logseq.provideModel({ 
-    handleRandomPages: insertRandomNotes,
-   });
+  logseq.provideModel({
+    handleRandomPages() {
+      insertRandomPages();
+    },
+  });
 
-  logseq.Editor.registerSlashCommand("🎲 Random Note", insertRandomNotes);
+  logseq.Editor.registerSlashCommand("🎲 Random Note", insertRandomPages);
 
   logseq.App.registerUIItem("toolbar", {
     key: "RandomPages",
@@ -194,7 +199,7 @@ function main() {
       </span>
     `,
   });
-  
+
   logseq.App.registerCommandPalette(
     {
       key: "logseq-insert-random-pages",
@@ -205,7 +210,7 @@ function main() {
       },
     },
     () => {
-      insertRandomNotes();
+      insertRandomPages();
     }
   );
 }
