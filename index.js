@@ -143,12 +143,21 @@ async function insertRandomPages() {
       pages = filterPagesByFilter(pages, "properties", false);
     }
 
-    let selectedPages = getUniqueRandomPages(pages, Math.min(randomPagesToReturn, pages.length));
+    let selectedPages = [];
+    if (pages.length === 0) {
+      return logseq.UI.showMsg("No pages found after filtering", "warning", {
+        timeout: 3000,
+      });
+    } else if (pages.length < randomPagesToReturn) {
+      selectedPages = pages;
+    } else {
+      selectedPages = getUniqueRandomPages(pages, Math.min(randomPagesToReturn, pages.length));
+    }
 
     if (sortPages) {
       selectedPages = selectedPages.sort((a, b) => {
-        const nameA = a.originalName.toLowerCase();
-        const nameB = b.originalName.toLowerCase();
+        const nameA = (a.originalName || a.name).toLowerCase();
+        const nameB = (b.originalName || b.name).toLowerCase();
         return nameA.localeCompare(nameB);
       });
     }
