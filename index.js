@@ -31,6 +31,13 @@ const settingsTemplate = [
     description: "Sort the pages alphabetically",
   },
   {
+    key: "appendPages",
+    type: "boolean",
+    default: true,
+    title: "Append pages",
+    description: "Append the pages to the current page",
+  },
+  {
     key: "journalMode",
     type: "enum",
     default: "include",
@@ -163,6 +170,7 @@ async function insertRandomPages() {
     }
 
     const headerBlockContent = (logseq.settings.headerBlock || "").trim();
+    const appendBlock = logseq.settings.appendPages;
 
     if (headerBlockContent) {
       const batchBlock = {
@@ -171,7 +179,11 @@ async function insertRandomPages() {
           content: `[[${page.originalName}]]`,
         })),
       };
-      const currBlock = await logseq.Editor.getCurrentBlock();
+      let currBlock = await logseq.Editor.getCurrentBlock();
+      if (appendBlock) {
+        const currentPage = await logseq.Editor.getCurrentPage();
+        currBlock = await logseq.Editor.appendBlockInPage(currentPage.uuid, "");
+      }
       const currentBlock = currBlock?.uuid || null;
       await logseq.Editor.insertBatchBlock(currentBlock, batchBlock, {
         sibling: true,
@@ -191,24 +203,21 @@ async function insertRandomPages() {
 
 function main() {
   logseq.provideModel({
-    handleRandomPages() {
-      insertRandomPages();
-    },
+    insertRandomPages,
   });
 
   logseq.Editor.registerSlashCommand("🎲 Random Note", insertRandomPages);
 
   logseq.App.registerUIItem("toolbar", {
-    key: "RandomPages",
+    key: "InsertRandomPages",
     template: `
       <span class="logseq-insert-random-pages-toolbar">
-        <a title="Insert random pages (r t)" class="button" data-on-click="handleRandomPages">
+        <a title="Insert random pages (r t)" class="button" data-on-click="insertRandomPages">
           <i class="ti ti-dice-5"></i>
         </a>
       </span>
     `,
   });
-
   logseq.App.registerCommandPalette(
     {
       key: "logseq-insert-random-pages",
