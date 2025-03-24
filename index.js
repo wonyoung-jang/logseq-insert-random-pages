@@ -38,6 +38,13 @@ const settingsTemplate = [
     description: "Append the pages to the current page",
   },
   {
+    key: "appendToSpecificPage",
+    type: "string",
+    default: "",
+    title: "Append to specific page",
+    description: "Append or insert the pages to a specific page (leave empty to attach to the current page)",
+  },
+  {
     key: "journalMode",
     type: "enum",
     default: "include",
@@ -99,9 +106,36 @@ async function insertPageLink(page) {
   }
 }
 
+async function getSpecificPage() {
+  const pageName = logseq.settings.appendToSpecificPage?.trim() || null;
+  if (pageName) {
+    const page = await logseq.Editor.getPage(pageName);
+    if (!page) {
+      logseq.Editor.createPage(pageName);
+      logseq.UI.showMsg(`Page ${pageName} created`, "warning", {
+        timeout: 3000,
+      });
+      return null;
+    } else {
+      logseq.App.pushState("page", {name: page.name});
+      return page;
+    }
+  }
+  return null;
+}
+
 async function insertRandomPages() {
   let randomPagesToReturn = Math.max(1, parseInt(logseq.settings.randomPagesToReturn || 1));
+
+  // Feature: Append to a specific page
+  const specificPage = await getSpecificPage();
+  if (specificPage) {
+    const page = await logseq.Editor.getPage(specificPage.name);
+    await logseq.Editor.appendBlockInPage(page.uuid, "");
+  }
+
   const editingMode = await logseq.Editor.checkEditing();
+  
   if (editingMode) {
     const { uuid } = await logseq.Editor.getCurrentBlock();
     const { content } = await logseq.Editor.getBlock(uuid);
